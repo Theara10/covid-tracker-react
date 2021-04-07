@@ -1,113 +1,33 @@
-// import logo from "./logo.svg";
-// import "./App.css";
-// import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-// import Login from "./components/Login";
-// import Signup from "./components/Signup";
-// import {
-//   gql,
-//   useQuery,
-//   ApolloProvider,
-//   ApolloClient,
-//   InMemoryCache,
-// } from "@apollo/client";
-// import { TokenContext } from "./context/tokenContext";
-// import { useContext, useState } from "react";
-
-// const QUERY_ME = gql`
-//   {
-//     me
-//   }
-// `;
-
-// function ApoloClientToken(token) {
-//   const client = new ApolloClient({
-//     uri: "http://localhost:3000/?token=" + token,
-//     cache: new InMemoryCache(),
-//   });
-
-//   return client;
-// }
-
-// function App() {
-//   const [token, setToken] = useState(localStorage.getItem("token"));
-
-//   return (
-//     <TokenContext.Provider value={{ token, setToken }}>
-//       <div className="App">
-//         <ApolloProvider client={ApoloClientToken(token)}>
-//           {token ? <RenderMe /> : <RenderUnauth />}
-//         </ApolloProvider>
-//       </div>
-//     </TokenContext.Provider>
-//   );
-// }
-
-// function RenderMe() {
-//   const context = useContext(TokenContext);
-//   const { data, loading } = useQuery(QUERY_ME, {
-//     onCompleted: (res) => {},
-//   });
-
-//   console.log(context);
-
-//   if (loading || data === undefined) {
-//     return <div>Loading...</div>;
-//   }
-
-//   if (data.me) {
-//     return (
-//       <div>
-//         {data.me.id}{" "}
-//         <button
-//           onClick={() => {
-//             localStorage.removeItem("token");
-//             context.setToken(null);
-//           }}
-//         >
-//           logout
-//         </button>{" "}
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <Router>
-//       <Switch>
-//         <Route path="/" component={Login} exact />
-//         <Route path="/signup" component={Signup} />
-//       </Switch>
-//     </Router>
-//   );
-// }
-
-// function RenderUnauth() {
-//   return (
-//     <Router>
-//       <Switch>
-//         <Route path="/" component={Login} exact />
-//         <Route path="/signup" component={Signup} />
-//       </Switch>
-//     </Router>
-//   );
-// }
-
-// export default App;
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
-
 import { FormControl, MenuItem, Select } from "@material-ui/core";
+import InfoBox from "./InfoBox";
 
 function App() {
-  const [countries, setCountries] = useState(["USA", "UK", "CAMBODIA"]);
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState("worldwide");
 
   useEffect(() => {
     const getCountriesData = async () => {
-      await fetch("https://disease.sh/v3/covid-19/countries").then((response) =>
-        response.json()
-      );
+      await fetch("https://disease.sh/v3/covid-19/countries")
+        .then((response) => response.json())
+        .then((data) => {
+          const countries = data.map((country) => ({
+            name: country.country,
+            value: country.countryInfo.iso2,
+          }));
+          setCountries(countries);
+          console.log("hi", countries);
+        });
     };
+    getCountriesData();
   }, []);
+
+  const onCountryChange = async (event) => {
+    const countryCode = event.target.value;
+
+    setCountry(countryCode);
+  };
 
   return (
     <div className="app">
@@ -115,20 +35,22 @@ function App() {
         <h1>COVID-19 TRACKER</h1>
 
         <FormControl className="app_dropdown">
-          <Select variant="outlined" value="abc">
+          <Select variant="outlined" onChange={onCountryChange} value={country}>
+            <MenuItem value="worldwide">WordWide</MenuItem>
             {countries.map((country) => (
-              <MenuItem value={country}>{country}</MenuItem>
+              <MenuItem value={country.value}>{country.name}</MenuItem>
             ))}
           </Select>
         </FormControl>
       </div>
 
+      <div className="app_stats">
+        <InfoBox title="Coronavirus Cases" cases="123" total="33536" />
+        <InfoBox title="Recovered" cases="123" total="33536" />
+        <InfoBox title="Deaths" cases="123" total="33536" />
+      </div>
       {/* Header */}
       {/* Title + select input dropdown field */}
-
-      {/* Info box */}
-      {/* Info box */}
-      {/* Info box */}
 
       {/* Table */}
       {/* Graph */}
