@@ -1,18 +1,11 @@
-/* .App {
-  justify-content: center;
-  align-items: center;
-}
-
-.login {
-  margin: 50px 50px;
-}
-
-.signup {
-  margin: 50px 50px;
-} */
-
 * {
   margin: 0;
+}
+
+.app {
+  display: flex;
+  justify-content: space-evenly;
+  padding-top: 20px;
 }
 
 body {
@@ -25,7 +18,17 @@ body {
   align-items: center;
 }
 
+.app_left {
+  flex: 0.9;
+}
+
 .app_stats {
   display: flex;
   justify-content: space-between;
+}
+
+@media (max-width: 990px) {
+  .app {
+    flex-direction: column;
+  }
 }
